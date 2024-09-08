@@ -1,6 +1,7 @@
 # Imports
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.optimize import curve_fit
 
 # General data
 box_height_in_pixels = 45
@@ -25,6 +26,11 @@ oscilloscope_frequencies = np.array([172, 256, 505, 757, 990, 1510, 1980, 2470, 
 amplitude_pixel_heights = np.array([181, 184, 175, 162, 142, 117, 234, 194, 167, 147, 130, 108, 85, 156, 140, 126,
                                     113, 105, 99, 90, 90, 54, 52, 36, 34, 37, 36, 35])
 
+# Using thinner, starting at filename_8, distinct voltage amplitude lines (higher errors on the pixels here, since
+# the exact highest and lowest points are rather hard to infer due to their overlap)
+amplitude_conservative_pixel_heights = np.array([181, 184, 175, 162, 142, 117, 223, 189, 156, 135, 115, 100, 86, 136,
+                                                 122, 109, 97, 88, 83, 79, 70, 43, 41, 36, 34, 37, 35, 36])
+
 # What exactly is this?
 voltage_dimensions = -1 * np.array([1.11, 1.11, 1.11, 1.11, 1.11, 1.11, 1.14, 1.14, 1.14, 1.14, 1.14, 1.14, 1.14,
                                     0.968, 0.968, 0.968, 0.968, 0.968, 0.968, 0.94, 0.94, 0.56, 0.56, 0.56, 0.56, 0.56,
@@ -38,11 +44,54 @@ print(amplitude_pixel_heights[0] / box_height_in_pixels)
 
 print(len(oscilloscope_frequencies), len(amplitude_pixel_heights), len(voltage_dimensions), len(chosen_voltage))
 
+amplitudes = chosen_voltage * amplitude_pixel_heights / box_height_in_pixels / 1000
+conservative_amplitudes = chosen_voltage * amplitude_conservative_pixel_heights / box_height_in_pixels / 1000
+
+frequencies = oscilloscope_frequencies
+
+# Definiere die Funktion, die angepasst werden soll
+def basic_exponential(x, a, b, c):
+    return a * np.exp(-b * x) + c
+
+
+def basic_reciprocal(x, a, b):
+    return a / x + b
+
+
+# Fitting der Daten mit curve_fit
+popt, pcov = curve_fit(basic_exponential, frequencies, amplitudes, p0=[2, 0.00035, 0.1])
+
+
+# Ausgeben der besten Parameter
+print("Best Fit Parameters:")
+for i, val in enumerate(popt):
+    print(f"{chr(97 + i)} = {val}")
+
+# Berechnen der Standardabweichungen (Fehler der Parameter)
+perr = np.sqrt(np.diag(pcov))
+
+print("\nParameter Errors (Standard deviations):")
+for i, val in enumerate(perr):
+    print(f"{chr(97 + i)} = {val}")
+
 
 plt.figure(figsize=(12, 5))
-plt.title('Chopper frequency against voltage amplitude')
-plt.xlabel('Chopper frequency in [Hz]')
-plt.ylabel('Voltage amplitude in [mV]')
+plt.title('Chopper frequency against voltage amplitude', fontsize=16)
+plt.xlabel('Chopper frequency in [Hz]', fontsize=13)
+plt.ylabel('Voltage amplitude in [mV]', fontsize=13)
 
-plt.scatter(frequencies, chosen_voltage * amplitude_pixel_heights / box_height_in_pixels)
+plt.scatter(frequencies, amplitudes, label='initial')
+plt.scatter(frequencies, conservative_amplitudes, label='conservative')
+
+# Plot der angepassten Kurve
+plt.plot(frequencies, basic_exponential(frequencies, *popt), label="Fitted function", color="red")
+# plt.plot(frequencies, basic_exponential(frequencies, 2050, 0.00035, 75), label="Fitted function", color="red")
+plt.plot(frequencies, basic_exponential(frequencies, popt[0] + perr[0], popt[1] - perr[1], popt[2] + perr[2]),
+         label=r"1-$\sigma$ confidence band", color="k", ls='--', lw=0.75)
+plt.plot(frequencies, basic_exponential(frequencies, popt[0] - perr[0], popt[1] + perr[1], popt[2] - perr[2]),
+         color="k", ls='--', lw=0.75)
+
+plt.tight_layout()
+plt.legend()
+plt.savefig('chopper_frequency_against_amplitude.png', dpi=200)
 plt.show()
