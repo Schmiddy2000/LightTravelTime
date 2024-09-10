@@ -8,7 +8,6 @@ parallax_error = 1 / np.sqrt(6)
 chopper_position_error = 1 / np.sqrt(3)
 position_error = 2 / np.sqrt(3)
 angular_position_error = 3 / np.sqrt(3)
-combined_position_error = np.sqrt(parallax_error ** 2 + position_error ** 2)
 
 
 def get_combined_reading_error(positional_error: float) -> float:
@@ -41,9 +40,7 @@ path_length_error = 2 * get_combined_error([chopper_to_mirror_error, tilted_mirr
                                             tilted_mirror_to_mirror_error, mirror_to_mirror_error])
 
 print(f'Parallax error: {round(parallax_error, 2)} mm')
-print(f'Position error: {round(position_error, 2)} mm')
 print(f'Chopper to mirror error: {round(chopper_to_mirror_error, 2)} mm')
 print(f'Tilted mirror error: {round(tilted_mirror_to_mirror_error, 2)} mm')
-print(f'Combined position error: {round(combined_position_error, 2)} mm')
 print(f'Mirror to mirror error: {round(mirror_to_mirror_error, 2)} mm')
 print(f'Path length = ({round(path_length, 2)} ± {round(path_length_error, 2)}) mm')
