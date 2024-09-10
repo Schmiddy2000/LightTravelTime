@@ -1,6 +1,5 @@
 # Imports
 import numpy as np
-
 from typing import List
 
 # Errors are in [mm]
@@ -18,7 +17,7 @@ def get_combined_error(errors: List[float]) -> float:
     return np.sqrt(np.sum([error ** 2 for error in errors]))
 
 
-# What is the chopper to mirror error? And should we treat the m3 to m4 error also differently (angle = 0)?
+# Combined errors for different paths
 chopper_to_mirror_error = get_combined_error([get_combined_reading_error(chopper_position_error),
                                               get_combined_reading_error(position_error)])
 
@@ -32,13 +31,13 @@ m1_to_m2 = 812
 m2_to_m3 = 811
 m3_to_m4 = 810
 
+# Path length and corresponding error
 path_length = 2 * (chopper_to_m1 + m1_to_m2 + m2_to_m3 + m3_to_m4)
 
-# This might need to be modified in case that we assume different errors (as mentioned above). Or do we have to
-# proceed differently anyway, since the error for a given path segment is the same for both directions?
 path_length_error = 2 * get_combined_error([chopper_to_mirror_error, tilted_mirror_to_mirror_error,
                                             tilted_mirror_to_mirror_error, mirror_to_mirror_error])
 
+# Printing out the results
 print(f'Parallax error: {round(parallax_error, 2)} mm')
 print(f'Chopper to mirror error: {round(chopper_to_mirror_error, 2)} mm')
 print(f'Tilted mirror error: {round(tilted_mirror_to_mirror_error, 2)} mm')
