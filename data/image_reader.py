@@ -61,7 +61,7 @@ def get_amplitude(image_index: int, show_img: bool = False) -> Optional[int]:
         return None
 
 
-# print(get_amplitude(1, True))
+print(get_amplitude(90, True))
 
 
 # To Do's:

@@ -22,9 +22,17 @@ frequency_errors = np.array([5, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
 oscilloscope_frequencies = np.array([172, 256, 505, 757, 990, 1510, 1980, 2470, 3010, 3520, 4030, 5000, 5950, 6990,
                                      8060, 9090, 10100, 11000, 12500, 12900, 14100, 14300, 15800, 16500, 17800, 19100,
                                      21400, 20800])
+oscilloscope_frequencies_2 = np.array([65, 1330, 1420, 1510, 1620, 1680, 1820, 1940, 19080, 2140, 2290, 2450,
+                                       2750, 2910, 3120, 3250, 4490, 5590, 6100, 6210,6330, 6450, 6710])
+
 
 amplitude_pixel_heights = np.array([181, 184, 175, 162, 142, 117, 234, 194, 167, 147, 130, 108, 85, 156, 140, 126,
                                     113, 105, 99, 90, 90, 54, 52, 36, 34, 37, 36, 35])
+
+amplitude_pixel_heights_2 = np.array([288, 207, 196, 193, 200, 180, 176, 171, 164, 164, 156, 152, 140, 135, 129,
+                                      124, 97, 86, 63, 78, 77, 76, 76])
+
+
 
 # Using thinner, starting at filename_8, distinct voltage amplitude lines (higher errors on the pixels here, since
 # the exact highest and lowest points are rather hard to infer due to their overlap)
@@ -39,14 +47,15 @@ voltage_dimensions = -1 * np.array([1.11, 1.11, 1.11, 1.11, 1.11, 1.11, 1.14, 1.
 # In mV
 chosen_voltage = np.array([500, 500, 500, 500, 500, 500, 200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100,
                            100, 100, 100, 100, 100, 100, 100, 100, 100, 100])
-
+chosen_voltage_2= 50
 print(amplitude_pixel_heights[0] / box_height_in_pixels)
 
 print(len(oscilloscope_frequencies), len(amplitude_pixel_heights), len(voltage_dimensions), len(chosen_voltage))
 
 amplitudes = chosen_voltage * amplitude_pixel_heights / box_height_in_pixels / 1000
 conservative_amplitudes = chosen_voltage * amplitude_conservative_pixel_heights / box_height_in_pixels / 1000
-
+amplitudes_2 = (chosen_voltage_2*amplitude_pixel_heights_2 / box_height_in_pixels /1000)
+frequencies_2 = oscilloscope_frequencies_2
 frequencies = oscilloscope_frequencies
 
 # Definiere die Funktion, die angepasst werden soll
@@ -82,7 +91,7 @@ plt.ylabel('Voltage amplitude in [mV]', fontsize=13)
 
 plt.scatter(frequencies, amplitudes, label='initial')
 plt.scatter(frequencies, conservative_amplitudes, label='conservative')
-
+plt.scatter(frequencies_2, amplitudes_2, label='day 2')
 # Plot der angepassten Kurve
 plt.plot(frequencies, basic_exponential(frequencies, *popt), label="Fitted function", color="red")
 # plt.plot(frequencies, basic_exponential(frequencies, 2050, 0.00035, 75), label="Fitted function", color="red")
