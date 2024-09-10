@@ -64,8 +64,9 @@ def get_amplitude(image_index: int, show_img: bool = False) -> Optional[int]:
 # print(get_amplitude(1, True))
 
 
-# ToDo's:
-# - Define the positions for the various components that should then be read using OCR
+# To Do's:
+# - Define the positions for the various components that should then be read using OCR (analogously to
+# the code in the CosmicMuons project)
 def get_voltage_dimension(image_index: int) -> None:
     img = mpimg.imread(f'Oscilloscope data/DS1Z_QuickPrint{image_index}.bmp')
     dim = np.shape(img)
